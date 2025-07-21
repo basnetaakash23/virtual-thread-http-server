@@ -1,12 +1,14 @@
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.time.Duration;
 import java.util.Timer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.logging.Logger;
 
 
 import static util.LogSystemStats.logSystemStats;
@@ -24,8 +26,18 @@ public class Threadpool {
         server.createContext("/logout", new LogoutHandler());
         server.createContext("/register", new RegisterHandler());
 
+        server.createContext("/ping", exchange -> {
+            String response = "pong";
+            exchange.sendResponseHeaders(200, response.length());
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(response.getBytes());
+            }
+        });
+
+
         // 🔁 Use traditional thread pool (pre-Java 21)
         int poolSize = Runtime.getRuntime().availableProcessors() * 2;
+        System.out.println("Using thread pool size: " + poolSize);
         ExecutorService executor = Executors.newFixedThreadPool(poolSize);
 
         server.setExecutor(executor);
