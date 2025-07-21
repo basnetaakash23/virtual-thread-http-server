@@ -34,6 +34,8 @@ public class VirtualThreadHttpServer {
             server.createContext("/send", new SendMessageHandler());
             server.createContext("/messages", new GetMessageHandler());
             server.createContext("/login", new LoginHandler());
+            server.createContext("/logout", new LogoutHandler());
+            server.createContext("/register", new RegisterHandler());
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             server.setExecutor(executor);
             server.start();
