@@ -17,6 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static util.LogSystemStats.logSystemStats;
 import static util.ServerUtil.parseQueryParams;
 
 public class VirtualThreadHttpServer {
@@ -40,6 +41,18 @@ public class VirtualThreadHttpServer {
             server.setExecutor(executor);
             server.start();
             System.out.println("Server started on port 8082");
+
+            new Thread(() -> {
+                while (true) {
+                    logSystemStats();
+                    try {
+                        Thread.sleep(5000); // 5 seconds in milliseconds
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }).start();
+
 
     }
 
