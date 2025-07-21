@@ -1,4 +1,4 @@
-package dto;
+package record;
 
 import java.time.Instant;
 

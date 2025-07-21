@@ -1,7 +1,9 @@
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import dto.Message;
+import record.AuthInfo;
+import record.Message;
+import util.ServerUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,10 +17,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static util.ServerUtil.parseQueryParams;
+
 public class VirtualThreadHttpServer {
 
     private static final List<Message> messages = new CopyOnWriteArrayList<>();
     private static final Map<String, List<Message>> inboxes = new ConcurrentHashMap<>();
+
 
 
     public static void main(String[] args) throws IOException {
@@ -28,6 +33,7 @@ public class VirtualThreadHttpServer {
             HttpServer server = HttpServer.create(new InetSocketAddress(8082), 0);
             server.createContext("/send", new SendMessageHandler());
             server.createContext("/messages", new GetMessageHandler());
+            server.createContext("/login", new LoginHandler());
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             server.setExecutor(executor);
             server.start();
@@ -95,25 +101,16 @@ public class VirtualThreadHttpServer {
         }
     }
 
-    private static Map<String, String> parseQueryParams(String query) {
-        Map<String, String> params = new ConcurrentHashMap<>();
-        if (query != null && !query.isEmpty()) {
-            String[] pairs = query.split("&");
-            for (String pair : pairs) {
-                String[] keyValue = pair.split("=");
-                if (keyValue.length == 2) {
-                    params.put(keyValue[0], keyValue[1]);
-                }
-            }
-        }
-        return params;
-    }
 
-    private static void sendResponse(HttpExchange exchange, int statusCode, String response) throws IOException {
+
+    public static void sendResponse(HttpExchange exchange, int statusCode, String response) throws IOException {
         exchange.sendResponseHeaders(statusCode, response.getBytes().length);
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(response.getBytes());
         }
     }
+
+
+
 
 }
