@@ -37,13 +37,8 @@ public class VirtualThreadHttpServer {
             server.createContext("/login", new LoginHandler());
             server.createContext("/logout", new LogoutHandler());
             server.createContext("/register", new RegisterHandler());
-            server.createContext("/ping", exchange -> {
-                String response = "pong";
-                exchange.sendResponseHeaders(200, response.length());
-                try (OutputStream os = exchange.getResponseBody()) {
-                    os.write(response.getBytes());
-                }
-            });
+            server.createContext("/ping", new PingPongHandler());
+
 
         ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             server.setExecutor(executor);

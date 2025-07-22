@@ -26,14 +26,7 @@ public class Threadpool {
         server.createContext("/logout", new LogoutHandler());
         server.createContext("/register", new RegisterHandler());
 
-        server.createContext("/ping", exchange -> {
-            String response = "pong";
-            exchange.sendResponseHeaders(200, response.length());
-            try (OutputStream os = exchange.getResponseBody()) {
-                os.write(response.getBytes());
-            }
-        });
-
+        server.createContext("/ping", new PingPongHandler());
 
         // 🔁 Use traditional thread pool (pre-Java 21)
         int poolSize = Runtime.getRuntime().availableProcessors() * 2;
